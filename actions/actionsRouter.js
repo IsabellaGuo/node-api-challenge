@@ -13,99 +13,118 @@ router.get("/", (req, res) => {
     })
     .catch(err => {
       console.log(err);
-      res.status(500).json({ error: "Error getting projects" });
+      res.status(500).json({ error: "The actions information could not be found" });
     });
 });
 
 //GET actions by id
-router.get("/:id", validateActionId, (req, res) => {
+router.get("/:id", validateAction, (req, res) => {
   const { id } = req.params;
+
   Actions.get(id)
     .then(actions => {
-      res.status(200).json(actions);
+        if (id) {
+            res.status(200).json(actions);
+        } else {
+            res.status(404).json({
+                error: "No action with that ID"
+              }); 
+        }
+      
     })
     .catch(err => {
       console.log(err);
-      res
-        .status(404)
-        .json({ error: "The action with specified id does not exist." });
+      res.status(500).json({
+        error: "The actions information could not be found"
+        });
     });
 });
 
 //POST new action
-router.post("/", validateAction, (req, res) => {
-  const { project_id, description, notes } = req.body;
-  Actions.insert({ project_id, description, notes })
-    .then(action => {
-      res.status(201).json(action);
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: "Project_id not found." });
-    });
-});
-
-//PUT updates for specified action
-router.put("/:id", validateActionId, validateProjectId, (req, res) => {
-  const { id } = req.params;
+router.post("/:id/actions", validateAction, (req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    const newAction = { ...body, project_id: id };
   
-  Actions.update(id, req.body)
-    .then(action => {
-      res.status(200).json(action);
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: "Error updating action." });
-    });
-});
+    Actions
+      .insert(newAction)
+      .then(action => {
+          res.status(200).json({ action })
+      })
+      .catch(err => {
+        res.status(500).json({
+          errorMessage: `There was an error while saving the action ${err.res}`
+        });
+      });
+  });
+
+//PUT updates 
+router.put("/:id", (req, res) => {
+    const id = req.params.id;
+    const body = req.body;
+  
+    Actions
+      .update(id, body)
+      .then(updatedA => {
+        if (!id) {
+          res.status(404).json({
+            message: "The action with the specific ID does not exist"
+          });
+        } else if (!updatedA.description || !updatedA.notes) {
+          res.status(400).json({
+            message: "Please provide description and notes for updated actions"
+          });
+        } else {
+          res.status(200).json({ updatedA });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: "The action information could not be updated"
+        });
+      });
+  });
 
 //DELETE specified action
-router.delete("/:id", validateActionId, (req, res) => {
-  const { id } = req.params;
-  Actions.remove(id)
-    .then(() => {
-      res.status(204).end();
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: "Error deleting action." });
-    });
-});
+router.delete("/:id", (req, res) => {
+    const id = req.params.id;
+  
+    Actions
+      .remove(id)
+      .then(deletedA => {
+        if (!id) {
+          res.status(404).json({
+            message: "The action with the specific ID does not exist"
+          });
+        } else {
+          res.status(200).json({ deletedA });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: "The action could not be removed"
+        });
+      });
+  });
 
 //custom middleware
 
-function validateActionId(req, res, next) {
-  const { id } = req.params;
-  Actions.get(id).then(action => {
-    if (action) {
-      req.action = action;
-      next();
-    } else {
-      res.status(404).json({ error: "The specified action does not exist" });
-    }
-  });
-}
-
 function validateAction(req, res, next) {
-  const { description, notes } = req.body;
-  if (!description || !notes) {
-    res.status(400).json({ error: "Fields required!" });
-  } else {
-    next();
+    if (!req.body) {
+      res.status(400).json({
+        message: "missing data"
+      });
+    } else if (!req.body.description || !req.body.notes) {
+      res.status(400).json({
+        message: "missing fields"
+      });
+    } else {
+      next();
+    }
   }
-}
 
-function validateProjectId (req, res, next) {
-  
-  Projects.get(req.body.id);
-  if (!req.body.id) {
-    res.status(400).json({ error: "Project not found" });
-  } else if (!name || !description) {
-    res.status(400).json({ error: "Action requires text" });
-  } else {
-    req.body = { project_id, name, description };
-    next();
-  }
-}
+
 
 module.exports = router;
