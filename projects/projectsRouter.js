@@ -135,30 +135,7 @@ router.delete("/:id", (req, res) => {
       });
   });
 
-//custom middleware
-function validateProject(req, res, next) {
-    const { name, description } = req.body;
-    if (!name || !description) {
-      res.status(400).json({ error: "Fields required!" });
-    } else if ((typeof name !== "string", typeof description !== "string")) {
-      res.status(400).json({ error: "Invalid field type." });
-    } else {
-      next();
-    }
-  }
-  
-  function validateProjectId (req, res, next) {
-    const { id: project_id } = req.params;
-    const { name, description } = req.body;
-    if (!req.body) {
-      res.status(400).json({ error: "Post requires body" });
-    } else if (!name || !description) {
-      res.status(400).json({ error: "Action requires text" });
-    } else {
-      req.body = { project_id, name, description };
-      next();
-    }
-  }
+
 
 
 

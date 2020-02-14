@@ -18,12 +18,12 @@ router.get("/", (req, res) => {
 });
 
 //GET actions by id
-router.get("/:id", validateAction, (req, res) => {
+router.get("/:id", (req, res) => {
   const { id } = req.params;
 
   Actions.get(id)
     .then(actions => {
-        if (id) {
+        if (actions) {
             res.status(200).json(actions);
         } else {
             res.status(404).json({
@@ -41,19 +41,19 @@ router.get("/:id", validateAction, (req, res) => {
 });
 
 //POST new action
-router.post("/:id/actions", validateAction, (req, res) => {
+router.post("/", (req, res) => {
     const body = req.body;
     const id = req.params.id;
     const newAction = { ...body, project_id: id };
   
     Actions
-      .insert(newAction)
+      .insert(body)
       .then(action => {
-          res.status(200).json({ action })
+          res.status(200).json(action)
       })
       .catch(err => {
         res.status(500).json({
-          errorMessage: `There was an error while saving the action ${err.res}`
+          errorMessage: `There was an error while saving the action ${err}`
         });
       });
   });

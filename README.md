@@ -40,13 +40,23 @@ Demonstrate your understanding of this Sprint's concepts by answering the follow
 
 - [ ] Mention two parts of Express that you learned about this week.
 
+Express middleware and Express server-side routing.
+
 - [ ] Describe Middleware?
+
+A function that gets executed in a specific linear order.
 
 - [ ] Describe a Resource?
 
+Data that is stored in a database; hardware or software that is accessible by the computer, network, or another object connected to a computer.
+
 - [ ] What can the API return to help clients know if a request was successful?
 
+Status codes in the 200s or returning the object.
+
 - [ ] How can we partition our application into sub-applications?
+
+Server-side routing.
 
 ## Minimum Viable Product
 
