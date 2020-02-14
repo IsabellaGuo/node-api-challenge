@@ -4,8 +4,8 @@ const server = express();
 
 server.use(express.json());
 
-// const actionsRouter = require("./actions/actionsRouter.js");
-// server.use("/api/actions", actionsRouter);
+const actionsRouter = require("./actions/actionsRouter.js");
+server.use("/api/actions", actionsRouter);
 
 const projectsRouter = require("./projects/projectsRouter.js");
 server.use("/api/projects", projectsRouter);

@@ -97,7 +97,7 @@ function validateProject(req, res, next) {
     }
   }
   
-  function validateProjectId(req, res, next) {
+  function validateProjectId (req, res, next) {
     const { id: project_id } = req.params;
     const { name, description } = req.body;
     if (!req.body) {
